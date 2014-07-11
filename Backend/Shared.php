@@ -316,22 +316,26 @@ class Shared implements \Hoa\Core\Event\Listenable {
      * @access  public
      * @param   string  $socket        Socket URI to PHP-FPM server.
      * @param   string  $workerPath    Path to the shared worker program.
+     * @param   array   $fcgiParams    Array of additional parameters for FastCGI.
      * @return  bool
      */
-    public static function start ( $socket, $workerPath ) {
+    public static function start ( $socket, $workerPath, $fcgiParams = array() ) {
+
+        if(!is_array($fcgiParams))
+            throw new Exception('fcgiParams must be an array');
 
         $server = new \Hoa\Fastcgi\Responder(
             new \Hoa\Socket\Client($socket)
         );
 
-        return $server->send(array(
+        return $server->send(array_merge(array(
             'GATEWAY_INTERFACE' => 'FastCGI/1.0',
             'SERVER_PROTOCOL'   => 'HTTP/1.1',
             'REQUEST_METHOD'    => 'GET',
             'REQUEST_URI'       => $workerPath,
             'SCRIPT_FILENAME'   => $workerPath,
             'SCRIPT_NAME'       => DS . dirname($workerPath)
-        ));
+        ), $fcgiParams));
     }
 
     /**
