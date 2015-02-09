@@ -21,3 +21,10 @@ echo Shared::start(
     __DIR__ . DIRECTORY_SEPARATOR . 'worker.php',
     ['foo' => 'bar', 'baz' => (float)15.466]
 );
+
+sleep(2);
+
+echo Shared::start(
+    'tcp://127.0.0.1:7000',
+    __DIR__ . DIRECTORY_SEPARATOR . 'worker.php'
+);
