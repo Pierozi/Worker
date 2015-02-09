@@ -314,28 +314,31 @@ class Shared implements \Hoa\Core\Event\Listenable {
      * Start the shared worker.
      *
      * @access  public
-     * @param   string  $socket        Socket URI to PHP-FPM server.
-     * @param   string  $workerPath    Path to the shared worker program.
-     * @param   array   $fcgiParams    Array of additional parameters for FastCGI.
+     * @param   string  $socket             Socket URI to PHP-FPM server.
+     * @param   string  $workerPath         Path to the shared worker program.
+     * @param   array   $fastcgiParameters  Array of additional parameters for FastCGI.
+     * @throw  \Hoa\Worker\Backend\Exception
      * @return  bool
      */
-    public static function start ( $socket, $workerPath, $fcgiParams = array() ) {
-
-        if(!is_array($fcgiParams))
-            throw new Exception('fcgiParams must be an array');
+    public static function start ( $socket, $workerPath, array $fastcgiParameters = array() ) {
 
         $server = new \Hoa\Fastcgi\Responder(
             new \Hoa\Socket\Client($socket)
         );
 
-        return $server->send(array_merge(array(
+        $headers = [
             'GATEWAY_INTERFACE' => 'FastCGI/1.0',
             'SERVER_PROTOCOL'   => 'HTTP/1.1',
-            'REQUEST_METHOD'    => 'GET',
             'REQUEST_URI'       => $workerPath,
             'SCRIPT_FILENAME'   => $workerPath,
             'SCRIPT_NAME'       => DS . dirname($workerPath)
-        ), $fcgiParams));
+        ];
+
+        $fastcgiParameters = array_merge([
+            'REQUEST_METHOD'    => 'GET'
+        ], $fastcgiParameters);
+
+        return $server->send(array_merge($fastcgiParameters, $headers));
     }
 
     /**
