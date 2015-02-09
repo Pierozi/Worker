@@ -5,7 +5,7 @@ require(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR 
 use Hoa\Worker\Backend\Shared;
 
 echo Shared::start(
-    'unix:///var/run/php5-fpm.pierozi.sock',
+    'tcp://127.0.0.1:7000',
     __DIR__ . DIRECTORY_SEPARATOR . 'worker.php',
     array(
         'argv[0]' => 'Foo',
@@ -14,8 +14,10 @@ echo Shared::start(
     )
 );
 
+sleep(2);
+
 echo Shared::start(
-    'unix:///var/run/php5-fpm.pierozi.sock',
+    'tcp://127.0.0.1:7000',
     __DIR__ . DIRECTORY_SEPARATOR . 'worker.php',
-    'foo'
+    ['foo' => 'bar', 'baz' => (float)15.466]
 );
